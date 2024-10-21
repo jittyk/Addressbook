@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>User Profile</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+   </head>
+   <body class="column min-vh-100">
+     <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+   <div class="container-fluid">
+      <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+         <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item"><a class="nav-link" href="#">Family</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Friends</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Colleagues</a></li>
+            <li class="nav-item">
+               <form class="d-inline-block">
+                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+               </form>
+            </li>
+            <li class="nav-item">
+               <a class="nav-link p-0" href="jitty.html">
+                  <img src="photo.jpg" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;margin-left: 6px;">
+               </a>
+            </li>
+         </ul>
+      </div>
+   </div>
+</nav>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Profile</title>
+    <style>
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile img {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="profile">
+            <img src="photo.jpg" alt="User Photo" width="100" height="100" class="img-fluid">
+            <div>
+                <h2>Jitty K Abraham</h2>
+                <p>Email: jittykabraham@gmail.com</p>
+                <p>Phone: 8589035404</p>
+                <p>BTech Graduate from College of Engineering Aranmula</p>
+                <p>Associate Software Engineer Trainee at Techversant.</p>
+            </div>
+        </div>
+
+        <div class="text-center mb-4">
+            <h2>Education</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Qualification</th>
+                        <th>Institute</th>
+                        <th>Passout Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BTech</td>
+                        <td>College of Engineering Aranmula</td>
+                        <td>2024</td>
+                    </tr>
+                    <tr>
+                        <td>Plus Two</td>
+                        <td>Gov H S S, Chittar</td>
+                        <td>2020</td>
+                    </tr>
+                    <tr>
+                        <td>SSLC</td>
+                        <td>Bethany St Mary's Girl's H S S, R-Perunad</td>
+                        <td>2018</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+<footer class="mt-auto bg-dark text-white py-3">
+   <div class="container">
+      <div class="row">
+         <div class="col-12 mb-3">
+            <ul class="list-unstyled d-flex flex-column flex-md-row justify-content-center mb-0">
+               <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Family</a></li>
+               <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Friends</a></li>
+               <li><a href="#" class="text-white text-decoration-none">Colleagues</a></li>
+            </ul>
+         </div>
+         <div class="col-12 mb-3 d-flex justify-content-center">
+            <div class="col-10 col-md-6 col-lg-4">
+               <input type="search" class="form-control" placeholder="Search">
+            </div>
+         </div>
+         <div class="col-12 text-center text-md-end">
+            <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+         </div>
+      </div>
+   </div>
+</footer>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   </body>
+</html>

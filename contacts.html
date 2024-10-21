@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .contact-details {
+            display: none;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+        }
+        .contact-container {
+            position: relative;
+        }
+        .is-invalid + .invalid-feedback {
+            display: block;
+        }
+        .modal-body {
+            max-height: calc(80vh - 120px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Family</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Friends</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Colleagues</a></li>
+                    <li class="nav-item">
+                        <form class="d-inline-block">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link p-0" href="jitty.html">
+                            <img src="photo.jpg" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; margin-left: 6px;">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container text-center mt-4">
+        <div class="row">
+            <div class="col">
+                <a href="import.html" class="btn btn-sm btn-outline-primary" style="margin-top:5px;">Import Contact</a>
+            </div>
+            <div class="col">
+                <a href="add.html" class="btn btn-sm btn-success" style="margin-top:5px;" id="openAddContact">Add Contact</a>
+            </div>
+            <div class="col">
+                <a href="export.html" class="btn btn-sm btn-outline-primary" style="margin-top:5px;">Export Contact</a>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-5" id="contactList">
+        <!-- Contacts will be dynamically added here -->
+    </div>
+    <footer class="mt-auto bg-dark text-white py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <ul class="list-unstyled d-flex flex-column flex-md-row justify-content-center mb-0">
+                        <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Family</a></li>
+                        <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Friends</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Colleagues</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 mb-3 d-flex justify-content-center">
+                    <div class="col-10 col-md-6 col-lg-4">
+                        <input type="search" class="form-control" placeholder="Search">
+                    </div>
+                </div>
+                <div class="col-12 text-center text-md-end">
+                    <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    initializeContacts();
+
+    document.getElementById('openAddContact').addEventListener('click', function () {
+        window.location.href = 'add.html'; // Redirect to add.html
+    });
+});
+
+function initializeContacts() {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'contacts.json', true);
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            const contacts = JSON.parse(xhr.responseText);
+            displayContacts(contacts);
+        } else {
+            console.error('Failed to load contacts:', xhr.statusText);
+        }
+    };
+    xhr.onerror = function() {
+        console.error('Error loading contacts');
+    };
+    xhr.send();
+}
+
+function displayContacts(contacts) {
+    const container = document.getElementById('contactList');
+    container.innerHTML = '';
+
+    contacts.forEach((contact, index) => {
+        const contactDiv = document.createElement('div');
+        contactDiv.className = 'contact-container border border-secondary p-2 mb-2';
+
+        contactDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-start" style="cursor: pointer;" onclick="toggleDetails(${index})">
+                    <b>${contact.firstname} ${contact.lastname}</b>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-2" onclick="editContact(${index})">Edit</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="confirmAndDelete(${index})">Delete</button>
+                </div>
+            </div>
+            <div id="details-${index}" class="contact-details mt-2" style="display: none;">
+                <p>Contact: ${contact.contact}</p>
+                <p>Email: ${contact.email}</p>
+                <p>Qualification: ${contact.qualification}</p>
+                <p>Country: ${contact.country}</p>
+                <p>City: ${contact.city}</p>
+                <p>State: ${contact.state}</p>
+                <p>Address: ${contact.address}</p>
+                <p>Pincode: ${contact.pincode}</p>
+                <p>Gender: ${contact.gender}</p>
+                <p>Languages: ${contact.languages.join(', ')}</p>
+            </div>
+        `;
+        container.appendChild(contactDiv);
+    });
+}
+
+function toggleDetails(index) {
+    const details = document.getElementById(`details-${index}`);
+    details.style.display = details.style.display === 'block' ? 'none' : 'block';
+}
+
+function editContact(index) {
+    // Navigate to add.html with index parameter
+    window.location.href = `add.html?index=${index}`;
+}
+
+function confirmAndDelete(index) {
+    if (confirm('Are you sure you want to delete this contact?')) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'contacts.json', true);
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const contacts = JSON.parse(xhr.responseText);
+                contacts.splice(index, 1);
+                saveContacts(contacts);
+                displayContacts(contacts);
+            } else {
+                console.error('Failed to load contacts:', xhr.statusText);
+            }
+        };
+        xhr.onerror = function() {
+            console.error('Error retrieving contacts');
+        };
+        xhr.send();
+    }
+}
+
+function saveContacts(contacts) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'save_contacts.php', true); // You'll need a server-side script to handle the saving
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(contacts));
+}
+
+    </script>
+</body>
+</html>

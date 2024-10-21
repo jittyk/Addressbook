@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa; 
+        }
+        .log-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .login-container {
+            text-align: center;
+           display: inline-block;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, #0623a1, #53a9f5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+            width: 100%;
+			
+            max-width: 400px; 
+            padding: 20px;
+            margin:60px;
+        }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        input.valid {
+            border-color: green;
+        }
+        input.invalid {
+            border-color: red;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Family</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Friends</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Colleagues</a></li>
+                    <li class="nav-item">
+                        <form class="d-inline-block">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link p-0" href="jitty.html">
+                            <img src="photo.jpg" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; margin-left: 6px;">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="log-container">
+        <div class="login-container">
+            <h1>Member Login</h1>
+            <form id="loginForm">
+                <label for="email">User ID:</label>
+                <input type="email" id="email" name="email" required >
+                <br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <br>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer class="mt-auto bg-dark text-white py-3">
+   <div class="container">
+      <div class="row">
+         <div class="col-12 mb-3">
+            <ul class="list-unstyled d-flex flex-column flex-md-row justify-content-center mb-0">
+               <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Family</a></li>
+               <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Friends</a></li>
+               <li><a href="#" class="text-white text-decoration-none">Colleagues</a></li>
+            </ul>
+         </div>
+         <div class="col-12 mb-3 d-flex justify-content-center">
+            <div class="col-10 col-md-6 col-lg-4">
+               <input type="search" class="form-control" placeholder="Search">
+            </div>
+         </div>
+        
+      </div>
+       <div class="col-12 text-center text-md-end">
+            <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+         </div>
+   </div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginForm = document.getElementById('loginForm');
+
+    let credentials = [];
+
+    // Fetch credentials from the JSON file using XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'credentials.json', true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) { 
+            if (xhr.status === 200) { 
+                try {
+                    credentials = JSON.parse(xhr.responseText); 
+                    console.log('Credentials loaded:', credentials); 
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                }
+            } else {
+                console.error('Error fetching credentials:', xhr.statusText);
+            }
+        }
+    };
+    xhr.send(); 
+
+    // Validate user ID when input changes
+    emailInput.addEventListener('input', function () {
+        validateUserId(this);
+    });
+
+    loginForm.addEventListener('submit', function (event) {
+        event.preventDefault(); 
+
+        if (!loginForm.dataset.submitted) {
+            loginForm.dataset.submitted = 'true'; 
+
+            validateAndSubmitForm();
+        }
+    });
+
+    function validateUserId(input) {
+        const email = input.value.trim();
+        const isValid = credentials.some(credential => credential.email === email);
+
+        if (isValid) {
+            input.classList.add('valid');
+            input.classList.remove('invalid');
+        } else {
+            input.classList.remove('valid');
+            input.classList.add('invalid');
+        }
+    }
+
+   
+    function validateAndSubmitForm() {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        console.log('Submitted Email:', email); 
+        console.log('Submitted Password:', password);
+
+       
+        const user = credentials.find(credential => credential.email === email);
+
+        console.log('User found:', user); 
+
+        
+        if (user && user.password === password) {
+            alert('Login successful');
+            window.location.href = 'index.html';
+            alert('Invalid credentials');
+        }
+
+        loginForm.dataset.submitted = 'false';
+    }
+});
+
+
+
+</script>
+    <script src="login.js" defer></script>
+</body>
+</html>

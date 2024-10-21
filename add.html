@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>Add Contact</title>
+    <style>
+        .error {
+            border-color: red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.875em;
+        }
+
+        .form-select, .form-control {
+            width: 90%;
+        }
+
+        .form-control.error {
+            border-color: red !important;
+        }
+        .error-message {
+    color: red;
+    font-size: 1.em;
+    </style>
+    <script>
+        function validateForm(event) {
+            event.preventDefault();
+
+            // Remove any previous error messages
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach((msg) => msg.remove());
+
+            // Fields to validate
+            const fields = [
+                { id: 'fname', name: 'First Name' },
+                { id: 'lname', name: 'Last Name' },
+                { id: 'contact', name: 'Contact Number', pattern: /^\d{10}$/, errorMessage: 'must be a valid 10-digit number' },
+                { id: 'email', name: 'Email ID', pattern: /^\S+@\S+\.\S+$/, errorMessage: 'must be a valid email address' },
+                { id: 'qualification', name: 'Qualification' },
+                { id: 'country', name: 'Country' },
+                { id: 'city', name: 'City' },
+                { id: 'state', name: 'State' },
+                { id: 'address', name: 'Address' },
+                { id: 'pincode', name: 'Pincode', pattern: /^\d{6}$/, errorMessage: 'must be a valid 6-digit pincode' }
+            ];
+
+            let isValid = true;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                input.classList.remove('error');
+
+                if (input.value.trim() === "" || (field.pattern && !field.pattern.test(input.value.trim()))) {
+                    isValid = false;
+                    input.classList.add('error');
+
+                    const errorMessage = document.createElement('div');
+                    errorMessage.classList.add('error-message');
+                    errorMessage.textContent = `${field.name} ${field.errorMessage || 'is required.'}`;
+                    input.parentNode.appendChild(errorMessage);
+                }
+            });
+
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const languages = document.querySelectorAll('input[type="checkbox"]:checked');
+
+            if (!gender) {
+                isValid = false;
+                const genderErrorContainer = document.getElementById('genderError');
+                const errorMessage = document.createElement('div');
+                errorMessage.classList.add('error-message');
+                errorMessage.textContent = 'Gender must be selected.';
+                genderErrorContainer.appendChild(errorMessage);
+            }
+
+            if (languages.length === 0) {
+                isValid = false;
+                const languagesErrorContainer = document.getElementById('languagesError');
+                const errorMessage = document.createElement('div');
+                errorMessage.classList.add('error-message');
+                errorMessage.textContent = 'At least one language must be selected.';
+                languagesErrorContainer.appendChild(errorMessage);
+            }
+
+            if (isValid) {
+                loadContacts(function (contacts) {
+                    const firstname = document.getElementById('fname').value.trim();
+                    const lastname = document.getElementById('lname').value.trim();
+                    const contact = document.getElementById('contact').value.trim();
+                    const email = document.getElementById('email').value.trim();
+
+                    const contactExists = contacts.some(c =>
+                        (c.firstname === firstname && c.lastname === lastname) ||
+                        c.contact === contact ||
+                        c.email === email
+                    );
+
+                    if (contactExists) {
+                        isValid = false;
+                        const generalErrorContainer = document.getElementById('generalError');
+                        const errorMessage = document.createElement('div');
+                        errorMessage.classList.add('error-message');
+                        errorMessage.textContent = 'A contact with this information already exists.';
+                        generalErrorContainer.appendChild(errorMessage);
+
+                          generalErrorContainer.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                    }
+
+                    if (isValid) {
+                        submitForm();
+                    }
+                });
+            }
+        }
+
+       function submitForm() {
+  
+
+    // After successful validation and form submission, show success message
+    alert("Form submitted successfully!");
+
+    // Navigate to contacts.html after submission
+    window.location.href = "contacts.html";
+}
+
+            const formData = {
+                firstname: document.getElementById('fname').value,
+                lastname: document.getElementById('lname').value,
+                contact: document.getElementById('contact').value,
+                email: document.getElementById('email').value,
+                qualification: document.getElementById('qualification').value,
+                country: document.getElementById('country').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                address: document.getElementById('address').value,
+                pincode: document.getElementById('pincode').value,
+                gender: document.querySelector('input[name="gender"]:checked').value,
+                languages: Array.from(document.querySelectorAll('input[name="languages"]:checked')).map(el => el.value)
+            };
+
+            xhr.send(JSON.stringify(formData));
+        
+
+        function loadContacts(callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'contacts.json', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var contacts = JSON.parse(xhr.responseText);
+                    callback(contacts);
+                }
+            };
+            xhr.send();
+        }
+
+        function validateEmailAndContactRealTime() {
+            const emailInput = document.getElementById('email');
+            const contactInput = document.getElementById('contact');
+
+            emailInput.addEventListener('input', function () {
+                checkIfEmailExists(emailInput.value.trim());
+            });
+
+            contactInput.addEventListener('input', function () {
+                checkIfContactExists(contactInput.value.trim());
+            });
+        }
+
+        function checkIfEmailExists(email) {
+            loadContacts(function (contacts) {
+                const emailExists = contacts.some(contact => contact.email === email);
+
+                const emailInput = document.getElementById('email');
+                const emailErrorContainer = document.getElementById('emailError');
+                emailInput.classList.remove('error');
+
+                if (emailErrorContainer) {
+                    emailErrorContainer.remove(); // Remove any existing error message
+                }
+
+                if (emailExists) {
+                    emailInput.classList.add('error');
+                    const errorMessage = document.createElement('div');
+                    errorMessage.id = 'emailError';
+                    errorMessage.classList.add('error-message');
+                    errorMessage.textContent = 'Email already exists. Please enter a different one.';
+                    emailInput.parentNode.appendChild(errorMessage);
+                }
+            });
+        }
+function checkIfContactExists(contact) {
+    loadContacts(function (contacts) {
+        const contactExists = contacts.some(c => c.contact === contact);
+
+        const contactInput = document.getElementById('contact');
+        const contactErrorContainer = document.getElementById('contactError');
+        contactInput.classList.remove('error');
+
+        if (contactErrorContainer) {
+            contactErrorContainer.remove(); // Remove any existing error message
+        }
+
+        if (contactExists) {
+            contactInput.classList.add('error');
+            const errorMessage = document.createElement('div');
+            errorMessage.id = 'contactError';
+            errorMessage.classList.add('error-message');
+            errorMessage.textContent = 'Contact number already exists. Please enter a different one.';
+            contactInput.parentNode.appendChild(errorMessage);
+
+            // Define generalErrorContainer properly
+            const generalErrorContainer = document.getElementById('generalError');
+            if (generalErrorContainer) {
+                setTimeout(() => {
+                    generalErrorContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 100);
+            }
+        }
+    });
+}
+
+        document.addEventListener('DOMContentLoaded', function () {
+            validateEmailAndContactRealTime();
+        });
+    </script>
+</head>
+
+<body>
+   <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+   <div class="container-fluid">
+      <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+         <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item"><a class="nav-link" href="#">Family</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Friends</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Colleagues</a></li>
+            <li class="nav-item">
+               <form class="d-inline-block">
+                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+               </form>
+            </li>
+            <li class="nav-item">
+               <a class="nav-link p-0" href="jitty.html">
+                  <img src="photo.jpg" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;margin-left: 6px;">
+               </a>
+            </li>
+         </ul>
+      </div>
+   </div>
+</nav>
+    <div class="container my-5">
+        <h1 class="mb-4">Add Contact Form</h1>
+<div id="generalError"></div>
+
+
+        <p>Please fill out the form below to add a new contact:</p>
+         <form action="contacts.html" method="GET" onsubmit="validateForm(event)">
+   <div class="mb-3 row">
+                <label for="fname" class="col-sm-2 col-form-label">First Name</label>
+                <div class="col-sm-10">
+                    <input type="text" id="fname" name="firstname" class="form-control" placeholder="Your name..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="lname" class="col-sm-2 col-form-label">Last Name</label>
+                <div class="col-sm-10">
+                    <input type="text" id="lname" name="lastname" class="form-control" placeholder="Your last name..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="contact" class="col-sm-2 col-form-label">Contact no</label>
+                <div class="col-sm-10">
+                    <input type="text" id="contact" name="contact" class="form-control" placeholder="Your contact number..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="email" class="col-sm-2 col-form-label">Email Id</label>
+                <div class="col-sm-10">
+                    <input type="text" id="email" name="email" class="form-control" placeholder="Your Email Id..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="qualification" class="col-sm-2 col-form-label">Qualification</label>
+                <div class="col-sm-10">
+                    <select id="qualification" name="qualification" class="form-select">
+                        <option value="">Select Qualification</option>
+                        <option value="BTech">BTech</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Plus Two">Plus Two</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="country" class="col-sm-2 col-form-label">Country</label>
+                <div class="col-sm-10">
+                    <select id="country" name="country" class="form-select">
+                        <option value="">Select Country</option>
+                        <option value="INDIA">INDIA</option>
+                        <option value="AMERICA">AMERICA</option>
+                        <option value="UAE">UAE</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="city" class="col-sm-2 col-form-label">City</label>
+                <div class="col-sm-10">
+                    <input type="text" id="city" name="city" class="form-control" placeholder="Your city name..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="state" class="col-sm-2 col-form-label">State</label>
+                <div class="col-sm-10">
+                    <input type="text" id="state" name="state" class="form-control" placeholder="Your state..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="address" class="col-sm-2 col-form-label">Address</label>
+                <div class="col-sm-10">
+                    <textarea id="address" name="address" class="form-control" placeholder="type here.."></textarea>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="pincode" class="col-sm-2 col-form-label">Pincode</label>
+                <div class="col-sm-10">
+                    <input type="text" id="pincode" name="pincode" class="form-control" placeholder="Your pincode..">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-2 col-form-label">Gender:</label>
+                <div class="col-sm-10">
+                    <div class="d-flex flex-wrap">
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" id="male" name="gender" value="male">
+                            <label class="form-check-label" for="male">Male</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="female" name="gender" value="female">
+                            <label class="form-check-label" for="female">Female</label>
+                        </div>
+                    </div>
+                    <div id="genderError"></div>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-2 col-form-label">Languages known:</label>
+                <div class="col-sm-10 mt-2">
+                    <div class="d-flex flex-wrap">
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="checkbox" id="malayalam" name="languages" value="malayalam">
+                            <label class="form-check-label" for="malayalam">Malayalam</label>
+                        </div>
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="checkbox" id="english" name="languages" value="english">
+                            <label class="form-check-label" for="english">English</label>
+                        </div>
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="checkbox" id="hindi" name="languages" value="hindi">
+                            <label class="form-check-label" for="hindi">Hindi</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="tamil" name="languages" value="tamil">
+                            <label class="form-check-label" for="tamil">Tamil</label>
+                        </div>
+                    </div>
+                    <div id="languagesError"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="reset" class="btn btn-secondary me-2">Reset</button>
+                <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+        </form>
+    </div>
+<footer class="mt-auto bg-dark text-white py-3">
+   <div class="container">
+      <div class="row">
+         <div class="col-12 mb-3">
+            <ul class="list-unstyled d-flex flex-column flex-md-row justify-content-center mb-0">
+               <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Family</a></li>
+               <li class="me-md-3 mb-2 mb-md-0"><a href="#" class="text-white text-decoration-none">Friends</a></li>
+               <li><a href="#" class="text-white text-decoration-none">Colleagues</a></li>
+            </ul>
+         </div>
+         <div class="col-12 mb-3 d-flex justify-content-center">
+            <div class="col-10 col-md-6 col-lg-4">
+               <input type="search" class="form-control" placeholder="Search">
+            </div>
+         </div>
+         <div class="col-12 text-center text-md-end">
+            <a class="navbar-brand" href="index.html"><b>Address Book</b></a>
+         </div>
+      </div>
+   </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
